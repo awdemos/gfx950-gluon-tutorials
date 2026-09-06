@@ -24,6 +24,7 @@ math and the plugin declares its groups in instructions, so the backend peephole
 splits whatever lands in a shadow.
 """
 
+import logging
 import os
 import sys
 
@@ -48,8 +49,9 @@ if os.environ.get("LLVM_PASS_PLUGIN_PATH"):
                 os.path.join(os.path.dirname(sys.modules["triton"].__file__), "_C", "libtriton.so"),
                 mode=ctypes.RTLD_GLOBAL,
             )
-        except OSError:
-            pass  # best effort; bench.py sets the flag early enough on its own
+        except OSError as exc:
+            logging.warning("Could not promote libtriton to RTLD_GLOBAL: %s", exc)
+            # Best effort; bench.py sets the flag early enough on its own.
 
 import torch
 import triton
